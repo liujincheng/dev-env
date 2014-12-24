@@ -1,0 +1,1 @@
+alias loc="locate -d $TAGTOP/.dirlocate.db"

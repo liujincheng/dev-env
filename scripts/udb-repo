@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if [ $# != 1 ]
+then
+    echo "udb <path>"
+    exit -1
+fi
+
+PWD=$(pwd)
+export PRJTOP=$1
+export TAGTOP=$PRJTOP/tags
+cd $PRJTOP
+
+SRCLIST="build system kernel-3.10 device vendor bootable"
+mkdir -p $PRJTOP/changelog ;
+mkdir -p $PRJTOP/synclog ;
+mkdir -p $PRJTOP/dailybuild
+mkdir -p $PRJTOP/dailybuild/$(date '+%y%m%d')
+mkdir -p $PRJTOP/buildlog
+CHANGELOG=$PRJTOP/changelog/changelog-$(date '+%y%m%d').txt
+CHANGEFULLLOG=$PRJTOP/changelog/changelog-$(date '+%y%m%d')_full.txt
+SYNCLOG=$PRJTOP/synclog/synclog-$(date '+%y%m%d').txt
+BUILDLOG=$PRJTOP/buildlog/make$(date '+%m%d_%H%M')-log.txt
+DAILYBUILDIR=$PRJTOP/dailybuild/$(date '+%y%m%d')
+
+#sync repo code
+PRJPATTERN="lk|kernel|ftm|nvram|preloader|htc"
+/home/liu/code1/bin/repo sync 2>$SYNCLOG 1>$SYNCLOG;
+/home/liu/code1/bin/repo sync 2>$SYNCLOG 1>$SYNCLOG;
+echo "changelog @ " $PRJPATTERN " on " $(date '+%Y-%m-%d %H:%M') > $CHANGELOG
+/home/liu/code1/bin/repo forall -r $PRJPATTERN -p -c git log --no-color --pretty=oneline --abbrev-commit --graph --date=short --since "1 days ago" >> $CHANGELOG ;
+/home/liu/code1/bin/repo forall -r $PRJPATTERN -p -c git log --pretty=format:'commit %h %d %s | %cd %an(%ae)%n%b' --date=short -p --since "1 days ago"  > $CHANGEFULLLOG
+cat $PRJTOP/changelog/changelog-$(date '+%y%m%d').txt | mail -s changelog-$PRJPATTERN-$(date '+%y%m%d') liu@liu-jincheng -- -f liu_jincheng@qq.com
+cat $PRJTOP/changelog/changelog-$(date '+%y%m%d').txt | mail -s changelog-$PRJPATTERN-$(date '+%y%m%d') jincheng_liu@htc.com -- -f liu_jincheng@qq.com
+
+#build repo code
+export HTC_USERDATA_APK=""; export PRIVATE_RCMS_APP="A55ML_DTUL_L50_DESIRE_SENSE70"; export HTC_DASHBOARD_BUILD="true"; export HTC_BUILD_STUBS_FLAG="false"; export PRIVATE_RCMS_NAME="A55ML_DTUL_L50_DESIRE_SENSE70"; export PRIVATE_RCMS_SKU=""; export PRIVATE_SKU_NAME="A55MLDTUL_Generic_WWE_L50_Mainline_DesireSense70_SHEP";
+env > $BUILDLOG ;
+. build/genHtcFlagconf.sh htc_a55ml_dtul DEBUG >> $BUILDLOG ;
+source build/envsetup.sh  >> $BUILDLOG 2>&1 ;
+lunch htc_a55ml_dtul-userdebug DEBUG >> $BUILDLOG 2>&1 ;
+make clean  >> $BUILDLOG 2>&1 ;
+make -k -j4 >> $BUILDLOG 2>&1 ;
+
+#backup images
+IMAGELIST="boot.img lk.bin logo.bin preloader.bin tee1.img tee2.img MT6795_Android_scatter.txt root"
+for img in $IMAGELIST
+do
+	find out/target/product/ -name $img -exec cp -rf {} $DAILYBUILDIR \;
+done
+
+cd $PWD

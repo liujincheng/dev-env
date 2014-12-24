@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if [ $# != 1 ]
+then
+    echo "udb <path>"
+    exit -1
+fi
+
+PWD=$(pwd)
+export PRJTOP=$1
+export TAGTOP=$PRJTOP/tags
+SRCLIST="build system kernel-3.10 device vendor bootable bionic external/libselinux"
+
+cd $PRJTOP
+
+mkdir -p $TAGTOP
+
+#update locate db
+echo "v" | sudo -S updatedb --prunepaths $PRJTOP/.repo -U $PRJTOP -o $TAGTOP/.dirlocate.db 2>/dev/null > $TAGTOP/log
+
+#update ctags db
+for src in $SRCLIST
+do
+        cd $PRJTOP/$src
+        ctags -aR --tag-relative -f $TAGTOP/tags 2>/dev/null >> $TAGTOP/log
+done
+
+#update filelist
+find $PRJTOP -wholename $PRJTOP/.repo -prune -o -type f 2>/dev/null > $TAGTOP/filelist
+find $PRJTOP -name "*" -type d > $TAGTOP/dirlist
+echo "!_TAG_FILE_SORTED        2       /2=foldcase/" > $TAGTOP/filenametags
+for src in $SRCLIST
+do
+        cd $PRJTOP/$src
+        find $PRJTOP/$src -type f -printf "%f\t%p\t1\n"  2>/dev/null | sort -f >> $TAGTOP/filenametags
+done
+
+#update cscope db
+for src in $SRCLIST
+do
+        cd $PRJTOP/$src
+        cscope -Rbqk -P $PRJTOP/$src  2>/dev/null >> $TAGTOP/log
+done
+
+cd $PWD

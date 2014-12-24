@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $# != 1 ]
+then
+    echo "udb <path>"
+    exit -1
+fi
+
+PWD=$(pwd)
+export PRJTOP=$1
+export TAGTOP=$PRJTOP/tags
+cd $PWD

@@ -2,4 +2,14 @@ export PRJTOP=$1
 export TAGTOP=$PRJTOP/tags
 alias loc="locate -d $TAGTOP/.dirlocate.db"
 mkdir -p $TAGTOP
+
+#alias ffind="grep $(pwd) $TAGTOP/filelist  | grep"
+
+function ffind
+{
+	grep $(pwd) $TAGTOP/filelist | grep $1 $2 $3
+}
+
+export SRCLIST="build system kernel-3.10 device vendor bootable bionic external/libselinux"
+
 cd $PRJTOP

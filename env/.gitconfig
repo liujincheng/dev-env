@@ -1,0 +1,22 @@
+[user]
+	name = jincheng_liu
+	email = jincheng_liu@htc.com
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit --date=short
+	st = status
+	co = checkout
+	ci = commit
+	br = branch
+	d1 = --since '1 days ago'
+	w1 = --since '1 weeks ago'
+	ad = add -up
+	add = add -up
+	difflog = log --pretty=format:'commit %h %d %s | %cd %an(%ae)%n%b' --date=short -p
+[commit]
+	template = /home/liu/.git_template
+[color]
+	ui = auto
+[core]
+	autocrlf = false
+	safecrlf = false
+	editor = vim

@@ -1,0 +1,26 @@
+genutils
+http://www.vim.org/scripts/script.php?script_id=197
+
+lookupFile
+http://www.vim.org/scripts/script.php?script_id=1581
+
+miniBuffer
+http://vim.sourceforge.net/scripts/script.php?script_id=159
+
+vimGrep
+http://www.vim.org/scripts/script.php?script_id=311
+
+winManager
+http://vim.sourceforge.net/scripts/script.php?script_id=1440
+
+taglist
+http://www.vim.org/scripts/script.php?script_id=273
+
+cscope
+sudo apt-get install cscsope
+http://cscope.sourceforge.net/large_projects.html
+
+======================================================
+Documents
+http://easwy.com/blog/archives/advanced-vim-skills-lookupfile-plugin/
+http://easwy.com/blog/archives/advanced-vim-skills-netrw-bufexplorer-winmanager-plugin/

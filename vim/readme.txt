@@ -24,3 +24,6 @@ http://cscope.sourceforge.net/large_projects.html
 Documents
 http://easwy.com/blog/archives/advanced-vim-skills-lookupfile-plugin/
 http://easwy.com/blog/archives/advanced-vim-skills-netrw-bufexplorer-winmanager-plugin/
+
+======================================================
+cp dev-env/vim/vimrc ~/.vim/vimrc

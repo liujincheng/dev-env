@@ -3,7 +3,10 @@
 # for examples
 
 # If not running interactively, don't do anything
-[ -z "$PS1" ] && return
+case $- in
+    *i*) ;;
+      *) return;;
+esac
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -28,7 +31,7 @@ shopt -s checkwinsize
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
@@ -102,18 +105,20 @@ fi
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
+  fi
 fi
 
-export PATH=/home/liu/code1/bin:$PATH
-export USE_CCACHE=1
+export PATH=/home/liu/bin:$PATH
+
+alias cdsrc="source ~/.bashrc.prj ~/src"
+alias tree="tree -A"
+
 export ID=jincheng_liu
 export MIRROR=10.33.8.6
-alias adbrestart='echo v | sudo ~/code1/bin/adb kill-server ; echo v | sudo ~/code1/bin/adb start-server'
-alias adb="~/code1/bin/adb"
-alias cdsyn="export PRJTOP=~/code1/share/MT6795_SYNC ; export TAGTOP=~/code1/share/MT6795_SYNC/tags ; cd ~/code1/share/MT6795_SYNC ; mkdir -p tags ; source build/envsetup.sh; source ~/.bashrc.loc"
-alias cddev="export PRJTOP=~/code1/share/MT6795_DEV ; export TAGTOP=~/code1/share/MT6795_DEV/tags ; cd ~/code1/share/MT6795_DEV ; mkdir -p tags ; source build/envsetup.sh; source ~/.bashrc.loc"
 
-alias bvim="vim -b"
-alias tree="tree --charset ASCII"
+export LANG=en_ALL

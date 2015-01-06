@@ -10,6 +10,7 @@ function ffind
 	grep $(pwd) $TAGTOP/filelist | grep $1 $2 $3
 }
 
-export SRCLIST="build system kernel-3.10 device vendor bootable bionic external/libselinux"
+export SRCLIST="build system kernel-3.10 kernel-3.10/arch/arm64 kernel-3.10/arch/arm bootable/bootloader/lk/arch/arm device vendor bootable bionic external/libselinux"
+export EXCLIST="arch"
 
 cd $PRJTOP

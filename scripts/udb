@@ -12,19 +12,33 @@ source /home/liu/.bashrc.prj $1
 
 cd $PRJTOP
 
-echo $PRJTOP
-echo $SRCLIST
+echo "PRJTOP=" $PRJTOP
+echo "SRCLIST=" $SRCLIST
+echo "EXCLUDE LIST=" $EXCLIST
 mkdir -p $TAGTOP
 
-#update locate db
-echo "v" | sudo -S updatedb --prunepaths $PRJTOP/.repo -U $PRJTOP -o $TAGTOP/.dirlocate.db 2>/dev/null > $TAGTOP/log
+#prepare filelist for ctags and cscope
+for exc in $EXCLIST
+do
+	EXCLIST_CSCOPE+="-name $exc -prune -o "
+done
 
-#update ctags db
+echo > $TAGTOP/cscope.files
 for src in $SRCLIST
 do
-        cd $PRJTOP/$src
-        ctags -aR --tag-relative -f $TAGTOP/tags 2>/dev/null >> $TAGTOP/log
+	find $PRJTOP/$src \( $EXCLIST_CSCOPE -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp"  -o -name "*.cc"  -o -name "*.mk" -o -name "*akefile" -o -name "*.java" \) -type f>> $TAGTOP/cscope.files
 done
+
+#update cscope db
+cd $TAGTOP
+cscope -Rbqk -i $TAGTOP/cscope.files  2>/dev/null >$TAGTOP/log
+
+#update ctags db
+ctags -R -L $TAGTOP/cscope.files  -f $TAGTOP/tags 2>/dev/null >> $TAGTOP/log
+
+
+#update locate db
+echo "v" | sudo -S updatedb --prunepaths $PRJTOP/.repo -U $PRJTOP -o $TAGTOP/.dirlocate.db 2>/dev/null >> $TAGTOP/log
 
 #update filelist
 find $PRJTOP -wholename $PRJTOP/.repo -prune -o -type f 2>/dev/null > $TAGTOP/filelist
@@ -34,13 +48,6 @@ for src in $SRCLIST
 do
         cd $PRJTOP/$src
         find $PRJTOP/$src -type f -printf "%f\t%p\t1\n"  2>/dev/null | sort -f >> $TAGTOP/filenametags
-done
-
-#update cscope db
-for src in $SRCLIST
-do
-        cd $PRJTOP/$src
-        cscope -Rbqk -P $PRJTOP/$src  2>/dev/null >> $TAGTOP/log
 done
 
 cd $PWD

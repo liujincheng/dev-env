@@ -8,7 +8,7 @@ fi
 
 PWD=$(pwd)
 
-source /home/liu/.bashrc.prj $1
+source ~/.bashrc.prj $1
 
 cd $PRJTOP
 

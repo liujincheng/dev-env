@@ -57,12 +57,9 @@ nmap <C-_>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <C-_>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
-let src=""
-for src in split($SRCLIST)
-	let g:cspath = printf("%s/%s", $PRJTOP, src)
-	let g:cspathfile = printf("%s/%s/cscope.out", $PRJTOP, src)
-	execute "cs add" g:cspathfile g:cspath
-endfor
+cs add $TAGTOP/cscope.out $PRJTOP
+
+nnoremap <silent> <F3> :Rgrep<CR>
 
 "for code editing
 set ts=4

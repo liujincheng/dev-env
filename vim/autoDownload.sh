@@ -1,7 +1,7 @@
 #/bin/sh
 
 mkdir -p ~/.vim
-cp .vimrc ~/.vimrc
+#cp .vimrc ~/.vimrc
 
 #gitv
 git clone https://github.com/gregsexton/gitv.git

@@ -38,14 +38,21 @@ let g:winManagerWindowLayout='FileExplorer|TagList'
 nmap wm :WMToggle<CR>
 nmap <C-W><C-F> :FirstExplorerWindow<cr>
 nmap <C-W><C-B> :BottomExplorerWindow<cr>
-"nmap <C-E> :resize +5<CR>
-""nmap <C-W> :resize -5<CR>
+
+"for file exployer netrw
+let g:netrw_winsize=20
+nmap <silent> <leader>se :Sexployer!<CR>
+nmap wj :resize -3<CR>
+nmap wk :resize +3<CR>
+nmap wh :vertical resize +3<CR>
+nmap wl :vertical resize -3<CR>
 
 "for minibuffer
 map <C-h> :bp<CR>
 map <C-l> :bn<CR>
 
 "for cscope quickfix window
+cs add $TAGTOP/cscope.out $PRJTOP
 :set cscopequickfix=s-,c-,d-,i-,t-,e-
 
 nmap <C-_>s :cs find s <C-R>=expand("<cword>")<CR><CR>
@@ -57,8 +64,7 @@ nmap <C-_>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
 nmap <C-_>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
 nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
-cs add $TAGTOP/cscope.out $PRJTOP
-
+nmap wr :Rgrep<CR>
 nnoremap <silent> <F3> :Rgrep<CR>
 
 "for code editing
@@ -81,10 +87,6 @@ let g:LookupFile_AlwaysAcceptFirst = 1
 let g:LookupFile_AllowNewFiles = 0
 let g:LookupFile_TagExpr = printf('"%s/tags/filenametags"',$PRJTOP)
 
-"for file exployer netrw
-let g:netrw_winsize=20
-nmap <silent> <leader>se :Sexployer!<CR>
-
 "for gitv config
 nmap <leader>gv :Gitv --all --no-merges<cr>
 vmap <leader>gV :Gitv! --all<cr>
@@ -106,3 +108,4 @@ set pastetoggle=<F11>
 nnoremap <silent> <F3> :Rgrep<CR>
 map <F2> :set nu!<CR>
 
+:colorscheme desert

@@ -42,3 +42,7 @@ cp -rf winmanager/* ~/.vim
 #netrw
 git clone https://github.com/vim-scripts/netrw.vim.git
 cp -rf netrw.vim/* ~/.vim
+
+#supertab
+git clone git@github.com:ervandew/supertab.git
+cp -rf supertab/* ~/.vim

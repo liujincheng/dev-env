@@ -12,6 +12,13 @@
 	ad = add -up
 	add = add -up
 	difflog = log --pretty=format:'commit %h %d %s | %cd %an(%ae)%n%b' --date=short -p
+	xlslog = "log --no-color --date=short --pretty=format:\"%cd#~%h#~%s#~%ce\""
+	lg1 = log -n 1 -p
+	caflog = log --no-color --pretty=format:'%ae&%cd&%s %b' --date=short
+	rst = reset
+	cp = cherry-pick
+	ss = status
+	mdiff = "grep ^diff | sed \"s|^diff --git|vimdiff|\" | sed \"s| a/^C|\" | sed \"s| b/| |\" "
 [commit]
 	template = /home/liu/.git_template
 [color]

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+PROJECT=`git config --list | grep projectname | awk -F"="  ' { print $2 } ' `
+URL=`git config --list | grep origin.review | awk -F"=" ' { print $2 } ' `
+
+export URL="git.htc.com:8081"
+for para in $@
+do
+	export PARA="$PARA $para"
+done
+
+git config --global alias.xlslog 'log --no-color --date=short --pretty=format:"%cd#~%h#~%s#~%ce"'
+repo forall -c ' git xlslog $PARA | sed "s|#~|#~${REPO_PROJECT}#~$URL/gitweb?p=${REPO_PROJECT}.git;a=commitdiff;h=|" | sed "s|#~|\t|g" ; echo "\n"' | sed "/^$/d"
+
+#you can use bellow command to sort commit list
+#repo init ; repo sync
+#gitxls_all --committer=jerry_white@htc.com --committer=midas_chieh@htc.com --committer=owen.ws_huang@htc.com --committer=robin_peng@htc.com --committer=changhao_chiang@htc.com > commit.xls
+#cat commit.xls | sort | uniq
+

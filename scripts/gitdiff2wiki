@@ -1,0 +1,189 @@
+#!/bin/bash
+
+unset -v list_diff_log _list_diff_log since until ignore csv author url
+unset -f list_diff_log _list_diff_log since until ignore csv author url
+
+declare VERSION="V2.1.1"
+####integrate csv format with wiki format, add display commit author(htc) function
+declare since=
+declare until=
+declare ignore=
+declare -x csv=
+declare -x author=
+declare -x url=
+
+#### Filter input arguments
+####--csv for csv output format
+if [ "$1" == "--csv" ]; then
+    csv=true
+    shift 1
+else
+    csv=false
+fi
+if [ "$1" == "--author" ]; then
+    author=true
+    shift 1
+else
+    author=false
+fi
+if [ "$1" == "--main-url" ]; then
+    url="http://git.htc.com:8081"
+    shift 1
+else
+    url="http://caf.git.htc.com:8082"
+fi
+if [ "$1" == "--since" ]; then
+    since="$2"
+    shift 2
+else
+    echo "Wrong Input !!"
+    echo "Usage:"
+    echo "gitdiff2wiki [--csv] [--author] [--main-url] --since <revision> --until <revision> [--ignore <revision>] [--project <proj1> <proj2> ...]"
+    echo "[--csv] for porting format"
+    echo "[--author] for using commit author or commiter to find review team"
+    echo "[--main-url] for commit on git.htc.com"
+    exit 1
+fi
+if [ "$1" == "--until" ]; then
+    until="$2"
+    shift 2
+else
+    echo "Wrong Input !!"
+    echo "Usage:"
+    echo "gitdiff2wiki [--csv] [--author] [--main-url] --since <revision> --until <revision> [--ignore <revision>] [--project <proj1> <proj2> ...]"
+    echo "[--csv] for porting format"
+    echo "[--author] for using commit author or commiter to find review team"
+    echo "[--main-url] for commit on git.htc.com"
+    exit 1
+fi
+if [ "$1" == "--ignore" ]; then
+    ignore="$2"
+    shift 2
+else
+    ignore="NONE"
+fi
+if [ "$1" == "--project" ]; then
+    shift 1
+fi
+
+list_diff_log ()
+{
+    declare _rev
+
+    declare _files
+    declare _title
+    declare _h
+    declare _project
+    declare threshold="30"
+
+    if [[ $(git log -1 $1 --format=%h) != "" ]] && [[ $(git log -1 $2 --format=%h) != "" ]] &&
+        [[ "$(git log --format=%h $1..$2)" != "" ]]; then
+
+        git log $2..$1 --no-merges --pretty='==========%n%f%n%b%n==========' |sed "s| |-|g" |grep -v Change-Id |grep -v Reviewed-on |grep -v Reviewed-by |grep -v Tested-by |grep -v "(cherry-picked-from-commit" > ./_new_changes_from_base;
+        if [[ "$3" != "" ]] && [[ "$3" != "NONE" ]] && [[ $(git log -1 $3 --format=%h) != "" ]]; then
+        git log $1..$3 --no-merges --pretty='==========%n%f%n%b%n==========' |sed "s| |-|g" |grep -v Change-Id |grep -v Reviewed-on |grep -v Reviewed-by |grep -v Tested-by |grep -v "(cherry-picked-from-commit" > ./_new_changes_from_ignore;
+        else
+            touch ./_new_changes_from_ignore;
+        fi
+
+        _rev="$(git log $1..$2 --format=%H --no-merges)";
+        count_new_changes=0
+        for i in $_rev; do
+
+            git log $i -1 --no-merges --pretty='%f%n%b' |sed "s| |-|g" |grep -v Change-Id |grep -v Reviewed-on |grep -v Reviewed-by |grep -v Tested-by |grep -v "(cherry-picked-from-commit" > ./_new_change;
+            if [[ $(diff --ignore-all-space --ignore-blank-lines ./_new_change ./_new_changes_from_base |grep "^< ") == "" ]] ||
+               [[ $(diff --ignore-all-space --ignore-blank-lines ./_new_change ./_new_changes_from_ignore |grep "^< ") == "" ]]; then
+                continue;
+            fi
+
+            #Get commit id
+            _h="$(git log $i -1 --format=%h)";
+            #Get changed file list
+            git diff-tree --no-commit-id --name-only -r $_h |head -n $threshold > ./_new_change_files;
+            #append complete path in file list
+            sed "s|^|$REPO_PATH/&|g" ./_new_change_files > ./_new_change_filesfull;
+            #replace \n with | in file list
+            _files=`tr "\n" "|" <./_new_change_filesfull`
+
+            #Get commit title
+            git log $i -1 --format=%s > ./_new_change_title;
+            #replace tab with /
+            _title=`tr "\t" "/" <./_new_change_title`
+            _title=`echo $_title |tr "%" "%_"`
+
+            add_git_prefix=`echo "$REPO_PROJECT" |grep ^"local/\|commion/android"`
+            if [ -z "$add_git_prefix" ]; then
+                #add local/ common/
+                if [ "$REPO_PROJECT" == "platform/external/wpa_supplicant_8" ]; then
+                    _project="common/android/$REPO_PROJECT"
+                else
+                    _project="local/$REPO_PROJECT"
+                fi
+            else
+                _project=$REPO_PROJECT
+            fi
+            if $author; then
+                commit_author="$(git log $i -1 --format=%ae)"
+                htc_author=$commit_author |grep "@htc.com"
+                if [ -z $htc_author ]; then
+                    commit_author="$(git log $i -1 --format=%ce)"
+                fi
+                commit_author=${commit_author%%@*}
+                if $csv; then
+                    echo `git log $i -1 --format="$url/gitweb?p=${REPO_PROJECT}.git;a=commitdiff;h=%h"`$'\t'"$_title"$'\t'"$_project"$'\t'"$_files"$'\t'$'\t'"$commit_author" >> ./_new_changes_template;
+                else
+                    echo "|-"$'\n'`git log $i -1 --format="| [$url/gitweb?p=${REPO_PROJECT}.git;a=commitdiff;h=%h %h]"`" || $_title || $_project || $commit_author" >> ./_new_changes_template;
+                fi
+            else
+                if $csv; then
+                    echo `git log $i -1 --format="$url/gitweb?p=${REPO_PROJECT}.git;a=commitdiff;h=%h"`$'\t'"$_title"$'\t'"$_project"$'\t'"$_files" >> ./_new_changes_template;
+                else
+                    echo "|-"$'\n'`git log $i -1 --format="| [$url/gitweb?p=${REPO_PROJECT}.git;a=commitdiff;h=%h %h]"`" || $_title || $_project" >> ./_new_changes_template;
+                fi
+            fi
+            count_new_changes=$((count_new_changes + 1))
+        done
+
+        [[ $count_new_changes != "0" ]] && cat ./_new_changes_template;
+        rm ./_new_change*;
+    fi
+}
+
+
+declare -x _list_diff_log;
+
+printf -v _list_diff_log 'eval %q' "$(declare -f list_diff_log)"
+
+if $csv; then
+    #CSV format##
+    if $author; then
+        echo "Commit"$'\t'"Title"$'\t'"Git"$'\t'"Files"$'\t'"Team"$'\t'"Reviewer";
+    else
+        echo "Commit"$'\t'"Title"$'\t'"Git"$'\t'"Files";
+    fi
+    echo repo forall $@ -vc bash -c 'eval "$_list_diff_log; list_diff_log $@"' $0 $since $until $ignore $@
+    repo forall $@ -c bash -c 'eval "$_list_diff_log; list_diff_log $@"' $0 $since $until $ignore $@
+else
+    ##wiki format##
+
+    echo "[[Category:SSD_Kernel_Team1]]"
+
+    echo "== Script Version: $VERSION =="
+
+    echo "== Monitoring projets =="
+    for i in $@; do
+        echo "* $i"
+    done
+
+    echo "== New changes since $since until $until (ignore $ignore) =="
+
+    echo '{| border=1 cellpadding=3 cellspacing=0';
+    echo '|-';
+    if $author; then
+        echo '! Commit !! Title !! Git !! Reviewer';
+    else
+        echo '! Commit !! Title !! Git';
+    fi
+    repo forall $@ -c bash -c 'eval "$_list_diff_log; list_diff_log $@"' $0 $since $until $ignore $@
+    echo "|}";
+fi

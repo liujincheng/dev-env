@@ -1,0 +1,8 @@
+#!/bin/sh
+
+PWD=$(pwd)
+PROJECT=`git config --list | grep projectname | awk -F"="  ' { print $2 } ' `
+URL=`git config --list | grep origin.review | awk -F"=" ' { print $2 } ' `
+
+git config --global alias.xlslog 'log --no-color --date=short --pretty=format:"%cd#~%h#~%s#~%ce"'
+git xlslog $@ | sed "s|#~|#~$PROJECT#~$URL/gitweb?p=$PROJECT.git;a=commitdiff;h=|" | sed "s|#~|\t|g"

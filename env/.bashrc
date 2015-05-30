@@ -122,3 +122,6 @@ export ID=jincheng_liu
 export MIRROR=10.33.8.6
 
 export LANG=en_ALL
+
+alias bvim="vim -b"
+alias tree="tree --charset ASCII"

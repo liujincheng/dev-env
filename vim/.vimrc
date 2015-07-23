@@ -52,6 +52,14 @@ nmap wl :vertical resize -3<CR>
 map <C-h> :bp<CR>
 map <C-l> :bn<CR>
 
+"for quickfix
+nmap <leader>cn :cn<CR>
+nmap <leader>cp :cp<CR>
+nmap <leader>cw :cw 10<CR>
+nmap wn :cn<CR>
+nmap wp :cp<CR>
+nmap ww :cw<CR>
+
 "for cscope quickfix window
 cs add $TAGTOP/cscope.out $PRJTOP
 :set cscopequickfix=s-,c-,d-,i-,t-,e-
@@ -103,6 +111,9 @@ function FoldDiff()
 	:set filetype=diff
 endfunction
 map <F12> :call FoldDiff()<CR>
+
+"supertab
+let g:SuperTabDefaultCompletionType = "<c-n>"
 
 set pastetoggle=<F11>
 

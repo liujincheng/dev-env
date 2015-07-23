@@ -86,7 +86,7 @@ let g:LookupFile_PreserveLastPattern = 0
 let g:LookupFile_PreservePatternHistory = 1
 let g:LookupFile_AlwaysAcceptFirst = 1
 let g:LookupFile_AllowNewFiles = 0
-let g:LookupFile_TagExpr = printf('"%s/tags/filenametags"',$PRJTOP)
+let g:LookupFile_TagExpr = printf('"%s/filenametags"',$TAGTOP)
 
 "for gitv config
 nmap <leader>gv :Gitv --all --no-merges<cr>
@@ -106,7 +106,6 @@ map <F12> :call FoldDiff()<CR>
 
 set pastetoggle=<F11>
 
-nnoremap <silent> <F3> :Rgrep<CR>
 map <F2> :set nu!<CR>
 
 :colorscheme desert

@@ -1,18 +1,19 @@
 #!/bin/bash
 
-if [ $# != 1 ]
+if [ $# != 1 ] && [ $# != 2 ]
 then
-    echo "udb <path>"
+    echo "udb <path> [prjname]"
     exit -1
 fi
 
 PWD=$(pwd)
 
-source ~/.bashrc.prj $1
+source /home/liu/.bashrc.prj $1 $2
 
 cd $PRJTOP
 
 echo "PRJTOP=" $PRJTOP
+echo "TAGTOP=" $TAGTOP
 echo "SRCLIST=" $SRCLIST
 echo "EXCLUDE LIST=" $EXCLIST
 mkdir -p $TAGTOP

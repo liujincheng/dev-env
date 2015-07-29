@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd /home/liu/code1/share/MT6795_SYNC ; ./dailybuild.sh
+cd /home/liu/code2/share/MT6753_SHEP ; ./dailybuild.sh
+cd /home/liu/code2/share/MT6752 ; ./dailybuild.sh
+#cd /home/liu/code1/share/MT6753_L1 ; ./dailybuild.sh

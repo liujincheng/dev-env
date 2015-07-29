@@ -1,5 +1,5 @@
 export PRJTOP=$1
-export TAGTOP=$PRJTOP/tags
+export TAGTOP=$PRJTOP/tags$2
 alias loc="locate -d $TAGTOP/.dirlocate.db"
 mkdir -p $TAGTOP
 
@@ -10,7 +10,18 @@ function ffind
 	grep $(pwd) $TAGTOP/filelist | grep $1 $2 $3
 }
 
-export SRCLIST="build system kernel-3.10 kernel-3.10/arch/arm64 kernel-3.10/arch/arm bootable/bootloader/lk/arch/arm device vendor bootable bionic external/libselinux"
-export EXCLIST="arch"
+function prjswitch
+{
+  export TAGTOP=$PRJTOP/tags$1
+}
+
+if test "$2" = "native"
+then
+  export SRCLIST="frameworks bionic art dalvik"
+  export EXCLIST=""
+else
+  export SRCLIST="build system kernel-3.10 kernel-3.10/arch/arm64 kernel-3.10/arch/arm bootable/bootloader/lk/arch/arm device vendor bootable external/libselinux"
+  export EXCLIST="arch"
+fi
 
 cd $PRJTOP

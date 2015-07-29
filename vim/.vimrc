@@ -75,6 +75,7 @@ nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
 nmap wr :Rgrep<CR>
 nnoremap <silent> <F3> :Rgrep<CR>
+nmap wf :lv /<c-r>=expand("<cword>")<cr>/ %<cr>:lw<cr> 
 
 "for code editing
 set ts=4
@@ -121,3 +122,5 @@ nnoremap <silent> <F3> :Rgrep<CR>
 map <F2> :set nu!<CR>
 
 :colorscheme desert
+
+set mouse=

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ $# != 1 ]
+then
+	echo "$0 <file>"
+	exit
+fi
+
+inotifywait -mrq -emodify -ecreate -edelete -emove $1 | \
+    while read file ;
+    do
+        /home/liu/bin/md2html $1 $1/Github.css
+    done

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+#批量将markdown格式转化为html
+
+if [ $# != 2 ]
+then
+	echo "$0 <dir> <css>"
+	exit
+fi
+
+DIR=$1
+mkdir -p $DIR/www
+WWWDIR=$DIR/www
+
+#prepare css
+cp $2 $WWWDIR
+cssfile=$2
+cssfile=${cssfile##/*/}
+chmod 777 $WWWDIR/$cssfile
+echo '<link rel="stylesheet" href="'$cssfile'" type="text/css" />' > $WWWDIR/header
+
+rm $DIR/all.md
+
+FILES=`find $DIR -name "*.md" | sort`
+for file in $FILES
+do
+	htmlfile=${file%%.md}
+	htmlfile=${htmlfile##/*/}
+	pandoc -s -H $WWWDIR/header -o $WWWDIR/$htmlfile.html $file
+	echo "### ["$htmlfile"]("$htmlfile.md")" >> $DIR/all.md
+done
+
+pandoc -s -H $WWWDIR/header --toc --toc-depth=2 -o $WWWDIR/all.html $DIR/all.md
+
+#prepare index.html
+sed -i "s|.md|.html|" $WWWDIR/index.html 
+sed -i "s|.md|.html|" $WWWDIR/all.html 
+
+cp -rf $DIR/pictures $WWWDIR

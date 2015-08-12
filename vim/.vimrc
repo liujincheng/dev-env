@@ -75,7 +75,11 @@ nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
 nmap wr :Rgrep<CR>
 nnoremap <silent> <F3> :Rgrep<CR>
-nmap wf :lv /<c-r>=expand("<cword>")<cr>/ %<cr>:lw<cr> 
+nmap fr :Rgrep<CR>
+nmap ff :lv /<c-r>=expand("<cword>")<cr>/ %<cr>:lw<cr>
+nmap fc :lcl<cr>
+nmap fw :cw<cr>
+nmap fx :ccl<cr>
 
 "for code editing
 set ts=4
